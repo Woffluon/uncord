@@ -193,6 +193,17 @@ powershell -File scripts/stage-release.ps1
 
 ---
 
+## Auto-Updates & Authenticity Policy
+
+The Windows desktop app (`uncord.exe`) checks `https://github.com/Woffluon/uncord/releases/latest/download/latest.json` and `latest.json.sig` after startup (can be disabled under Settings -> `Auto-check updates` or triggered manually).
+
+Every update check and download enforces:
+1. **Ed25519 signature verification first:** `latest.json` is verified against the pinned raw Ed25519 public key in [`assets/update-public-key.hex`](./assets/update-public-key.hex) before any JSON parsing occurs (`UPDATE_MANIFEST_PRIVATE_KEY_BASE64` never leaves GitHub Actions secrets).
+2. **Strict HTTPS allowlist:** Manifest, signature, and installer downloads allow HTTPS requests only to `github.com/Woffluon/uncord/*` and GitHub release object hosts (`objects.githubusercontent.com`, `release-assets.githubusercontent.com`), blocking redirects outside those hosts.
+3. **SHA-256 + Windows PE verification:** The NSIS installer (`uncord_<version>_x64-setup.exe`) is written atomically under `%LOCALAPPDATA%\uncord\Updates\`, verified against its signed SHA-256 digest and Win32 `FileVersion` resource (`major.minor.patch`), and held with a read-only launch lock when started.
+
+---
+
 ## License
 
 Released under the [MIT License](./LICENSE).

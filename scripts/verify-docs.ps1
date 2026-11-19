@@ -61,6 +61,7 @@ function Test-RequiredAssets {
     )
 
     $RequiredAssets = @(
+        "assets/update-public-key.hex",
         "brand/BRAND_GUIDELINES.md",
         "brand/uncord-lockup-color.svg",
         "brand/uncord-lockup-dark.svg",

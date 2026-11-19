@@ -1036,6 +1036,7 @@ mod tests {
                 minimize_to_tray_on_close: false,
                 start_minimized: true,
                 auto_reconnect: false,
+                update_checks_enabled: false,
                 active_profile_id: None,
                 theme: "light".into(),
             })

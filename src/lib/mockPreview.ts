@@ -9,6 +9,7 @@ import type {
   RouteConfig,
   RouteTelemetry,
   TransportKind,
+  UpdateStateSnapshot,
 } from "./ipc";
 
 const MOCK_DEVICES: AudioDeviceInfo[] = [
@@ -281,13 +282,33 @@ class MockPreviewEngine {
     autoReconnect: true,
     activeProfileId: "prof-guitar-bt",
     theme: "dark",
+    updateChecksEnabled: true,
   };
   private nextId = 1;
   private startTs = performance.now();
+  private updateListeners = new Set<(state: UpdateStateSnapshot) => void>();
+  private updateState: UpdateStateSnapshot = {
+    status: "ready",
+    currentVersion: "0.2.0",
+    availableVersion: null,
+    releaseUrl: null,
+    releaseNotes: null,
+    downloadedBytes: 0,
+    totalBytes: 0,
+    verifying: false,
+    errorMessage: null,
+  };
+
+  private emitUpdateState() {
+    const snap = { ...this.updateState };
+    for (const listener of this.updateListeners) {
+      listener(snap);
+    }
+  }
 
   private snapshot(): EngineSnapshot {
     return {
-      version: "0.1.0",
+      version: "0.2.0",
       devices: this.devices.map((d) => ({ ...d })),
       routes: this.routes.map((r) => ({ ...r })),
       profiles: this.profiles.map((p) => ({
@@ -471,6 +492,42 @@ class MockPreviewEngine {
 
   async getTelemetry(): Promise<RouteTelemetry[]> {
     return this.getTelemetrySync();
+  }
+
+  subscribeUpdateState(onState: (state: UpdateStateSnapshot) => void): () => void {
+    this.updateListeners.add(onState);
+    onState({ ...this.updateState });
+    return () => {
+      this.updateListeners.delete(onState);
+    };
+  }
+
+  async getUpdateState(): Promise<UpdateStateSnapshot> {
+    return { ...this.updateState };
+  }
+
+  async checkForUpdates(): Promise<UpdateStateSnapshot> {
+    this.updateState = { ...this.updateState, status: "upToDate", errorMessage: null };
+    this.emitUpdateState();
+    return { ...this.updateState };
+  }
+
+  async cancelUpdateCheck(): Promise<UpdateStateSnapshot> {
+    this.updateState = { ...this.updateState, status: "ready", errorMessage: null };
+    this.emitUpdateState();
+    return { ...this.updateState };
+  }
+
+  async downloadUpdate(): Promise<UpdateStateSnapshot> {
+    throw new Error("No verified update is available in browser preview");
+  }
+
+  async installUpdate(): Promise<void> {
+    throw new Error("Installer launch is only available in desktop runtime");
+  }
+
+  async openReleasePage(): Promise<void> {
+    window.open("https://github.com/Woffluon/uncord/releases", "_blank", "noopener,noreferrer");
   }
 }
 

@@ -193,6 +193,17 @@ powershell -File scripts/stage-release.ps1
 
 ---
 
+## Otomatik Güncelleme ve Doğrulama Politikası
+
+Windows masaüstü uygulaması (`uncord.exe`), açılıştan sonra `https://github.com/Woffluon/uncord/releases/latest/download/latest.json` ve `latest.json.sig` dosyalarını kontrol eder (Ayarlar -> `Auto-check updates` anahtarından kapatılabilir veya elle tetiklenebilir).
+
+Her güncelleme denetimi ve indirmesi şu kontrolleri uygular:
+1. **Önce Ed25519 imza doğrulaması:** `latest.json` dosyası JSON ayrıştırmasından önce [`assets/update-public-key.hex`](./assets/update-public-key.hex) içindeki sabitlenmiş Ed25519 açık anahtarıyla doğrulanır (`UPDATE_MANIFEST_PRIVATE_KEY_BASE64` yalnızca GitHub Actions gizli değişkeninde tutulur).
+2. **Sıkı HTTPS izin listesi:** Bildirim, imza ve kurucu indirmeleri yalnızca `github.com/Woffluon/uncord/*` ve GitHub sürüm barındırma adreslerine (`objects.githubusercontent.com`, `release-assets.githubusercontent.com`) izin verir; izin listesi dışındaki yönlendirmeleri engeller.
+3. **SHA-256 ve Windows PE doğrulaması:** NSIS kurucusu (`uncord_<sürüm>_x64-setup.exe`) `%LOCALAPPDATA%\uncord\Updates\` dizinine atomik olarak indirilir, imzalı SHA-256 özeti ve Win32 `FileVersion` kaynağı (`major.minor.patch`) doğrulandıktan sonra salt-okunur kilitle başlatılır.
+
+---
+
 ## Lisans
 
 [MIT Lisansı](./LICENSE) kapsamında yayınlanmıştır.

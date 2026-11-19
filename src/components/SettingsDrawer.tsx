@@ -1,14 +1,20 @@
 import { createPortal } from "react-dom";
-import { Moon, Sun, X } from "lucide-react";
-import type { AppSettings } from "../lib/ipc";
+import { Download, ExternalLink, Moon, RefreshCw, ShieldCheck, Sun, X } from "lucide-react";
+import type { AppSettings, UpdateStateSnapshot } from "../lib/ipc";
 
 interface SettingsDrawerProps {
   open: boolean;
   version: string;
   settings: AppSettings;
+  updateState: UpdateStateSnapshot | null;
   onClose: () => void;
   onUpdateSettings: (next: AppSettings) => void;
   onReplayTour: () => void;
+  onCheckUpdates: () => void;
+  onCancelUpdate: () => void;
+  onDownloadUpdate: () => void;
+  onInstallUpdate: () => void;
+  onOpenReleasePage: () => void;
 }
 
 function SettingSwitchRow({
@@ -66,13 +72,37 @@ export function SettingsDrawer({
   open,
   version,
   settings,
+  updateState,
   onClose,
   onUpdateSettings,
   onReplayTour,
+  onCheckUpdates,
+  onCancelUpdate,
+  onDownloadUpdate,
+  onInstallUpdate,
+  onOpenReleasePage,
 }: SettingsDrawerProps) {
   if (!open) return null;
 
   const isDark = settings.theme !== "light";
+  const updateStatus = updateState?.status ?? "ready";
+  const isBusy =
+    updateStatus === "checking" || updateStatus === "downloading" || updateStatus === "installing";
+
+  let updateStatusText = "Ready";
+  if (updateStatus === "checking") updateStatusText = "Checking GitHub Releases...";
+  else if (updateStatus === "upToDate") updateStatusText = "Up to date";
+  else if (updateStatus === "available")
+    updateStatusText = `v${updateState?.availableVersion ?? ""} available`;
+  else if (updateStatus === "downloading")
+    updateStatusText = updateState?.verifying
+      ? "Verifying SHA-256 & PE signature..."
+      : "Downloading update...";
+  else if (updateStatus === "verified")
+    updateStatusText = `v${updateState?.availableVersion ?? ""} ready to install`;
+  else if (updateStatus === "installing") updateStatusText = "Launching installer...";
+  else if (updateStatus === "error")
+    updateStatusText = updateState?.errorMessage ?? "Update check failed";
 
   return createPortal(
     <div
@@ -203,6 +233,122 @@ export function SettingsDrawer({
                 <Sun size={13} />
                 <span>Light</span>
               </button>
+            </div>
+          </div>
+
+          <SettingSwitchRow
+            title="Auto-check updates"
+            description="Verify signed GitHub releases quietly after launch."
+            checked={settings.updateChecksEnabled}
+            onToggle={() =>
+              onUpdateSettings({
+                ...settings,
+                updateChecksEnabled: !settings.updateChecksEnabled,
+              })
+            }
+          />
+
+          <div
+            className="p-3 rounded-[8px] border flex flex-col gap-2"
+            style={{
+              backgroundColor: "var(--bg-well)",
+              borderColor: "var(--border-subtle)",
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <span
+                className="text-[10px] font-semibold uppercase tracking-[0.08em]"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Updates
+              </span>
+              <span className="font-mono-num text-[11px]" style={{ color: "var(--text-muted)" }}>
+                v{version}
+              </span>
+            </div>
+            <p
+              className="text-[11px] leading-[1.45] font-mono-num"
+              style={{
+                color:
+                  updateStatus === "error"
+                    ? "var(--status-error)"
+                    : updateStatus === "verified"
+                      ? "var(--status-live)"
+                      : "var(--text-secondary)",
+              }}
+            >
+              {updateStatusText}
+            </p>
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              {updateStatus === "checking" || (updateStatus === "downloading" && !updateState?.verifying) ? (
+                <button
+                  type="button"
+                  onClick={onCancelUpdate}
+                  className="tactile-btn hover-surface h-7 px-2.5 rounded-[6px] border text-[11px] font-medium"
+                  style={{
+                    backgroundColor: "var(--bg-panel)",
+                    borderColor: "var(--border-strong)",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  Cancel
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={isBusy}
+                  onClick={onCheckUpdates}
+                  className="tactile-btn hover-surface h-7 px-2.5 rounded-[6px] border text-[11px] font-medium inline-flex items-center gap-1.5 disabled:opacity-50"
+                  style={{
+                    backgroundColor: "var(--bg-panel)",
+                    borderColor: "var(--border-strong)",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  <RefreshCw size={11} />
+                  <span>Check updates</span>
+                </button>
+              )}
+
+              {updateStatus === "available" && (
+                <button
+                  type="button"
+                  onClick={onDownloadUpdate}
+                  className="tactile-btn hover-accent h-7 px-2.5 rounded-[6px] text-[11px] font-semibold inline-flex items-center gap-1.5"
+                  style={{ backgroundColor: "var(--accent-signal)", color: "#ffffff" }}
+                >
+                  <Download size={11} />
+                  <span>Download</span>
+                </button>
+              )}
+
+              {updateStatus === "verified" && (
+                <button
+                  type="button"
+                  onClick={onInstallUpdate}
+                  className="tactile-btn hover-accent h-7 px-2.5 rounded-[6px] text-[11px] font-semibold inline-flex items-center gap-1.5"
+                  style={{ backgroundColor: "var(--accent-signal)", color: "#ffffff" }}
+                >
+                  <ShieldCheck size={11} />
+                  <span>Install &amp; Restart</span>
+                </button>
+              )}
+
+              {updateState?.releaseUrl && (
+                <button
+                  type="button"
+                  onClick={onOpenReleasePage}
+                  className="tactile-btn hover-surface h-7 px-2.5 rounded-[6px] border text-[11px] font-medium inline-flex items-center gap-1"
+                  style={{
+                    backgroundColor: "var(--bg-panel)",
+                    borderColor: "var(--border-subtle)",
+                    color: "var(--text-secondary)",
+                  }}
+                >
+                  <ExternalLink size={11} />
+                  <span>Release</span>
+                </button>
+              )}
             </div>
           </div>
 

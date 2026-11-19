@@ -55,6 +55,7 @@ try {
     Write-TestFile (Join-Path $FixtureRepo "README.md") "# uncord`nEnglish docs.`n"
     Write-TestFile (Join-Path $FixtureRepo "README.tr.md") "# uncord`nTurkce dokumantasyon.`n"
     Write-TestFile (Join-Path $FixtureRepo "CHANGELOG.md") "# Changelog`n"
+    Write-TestFile (Join-Path $FixtureRepo "assets\update-public-key.hex") "98477cb793eeaef02b61ca53e87a0094d51db4c6f910260b85fa46c54e497bea`n"
     Write-TestFile (Join-Path $FixtureRepo "brand\BRAND_GUIDELINES.md") "# uncord Brand Guidelines`n"
     Write-TestFile (Join-Path $FixtureRepo "brand\uncord-lockup-color.svg") "<svg viewBox='0 0 960 256'/>`n"
     Write-TestFile (Join-Path $FixtureRepo "brand\uncord-lockup-dark.svg") "<svg viewBox='0 0 960 256'/>`n"

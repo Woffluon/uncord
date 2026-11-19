@@ -3,6 +3,7 @@ import {
   EVENT_DEVICES_CHANGED,
   EVENT_ROUTE_STATUS,
   EVENT_TELEMETRY,
+  EVENT_UPDATE_STATE,
   uncordIpc,
   type AddRouteRequest,
   type AppSettings,
@@ -11,6 +12,7 @@ import {
   type Profile,
   type RouteConfig,
   type RouteTelemetry,
+  type UpdateStateSnapshot,
 } from "./ipc";
 import { mockPreviewEngine } from "./mockPreview";
 
@@ -64,6 +66,24 @@ export const audioClient = {
 
   getTelemetry: (): Promise<RouteTelemetry[]> =>
     isTauriRuntime() ? uncordIpc.getTelemetry() : mockPreviewEngine.getTelemetry(),
+
+  getUpdateState: (): Promise<UpdateStateSnapshot> =>
+    isTauriRuntime() ? uncordIpc.getUpdateState() : mockPreviewEngine.getUpdateState(),
+
+  checkForUpdates: (): Promise<UpdateStateSnapshot> =>
+    isTauriRuntime() ? uncordIpc.checkForUpdates() : mockPreviewEngine.checkForUpdates(),
+
+  cancelUpdateCheck: (): Promise<UpdateStateSnapshot> =>
+    isTauriRuntime() ? uncordIpc.cancelUpdateCheck() : mockPreviewEngine.cancelUpdateCheck(),
+
+  downloadUpdate: (): Promise<UpdateStateSnapshot> =>
+    isTauriRuntime() ? uncordIpc.downloadUpdate() : mockPreviewEngine.downloadUpdate(),
+
+  installUpdate: (): Promise<void> =>
+    isTauriRuntime() ? uncordIpc.installUpdate() : mockPreviewEngine.installUpdate(),
+
+  openReleasePage: (): Promise<void> =>
+    isTauriRuntime() ? uncordIpc.openReleasePage() : mockPreviewEngine.openReleasePage(),
 };
 
 export function subscribeTelemetry(
@@ -140,5 +160,33 @@ export function subscribeDeviceChanges(
     disposed = true;
     if (unlistenDevices) unlistenDevices();
     if (unlistenStatus) unlistenStatus();
+  };
+}
+
+export function subscribeUpdateState(
+  onState: (state: UpdateStateSnapshot) => void,
+): () => void {
+  if (!isTauriRuntime()) {
+    return mockPreviewEngine.subscribeUpdateState(onState);
+  }
+
+  let disposed = false;
+  let unlisten: UnlistenFn | null = null;
+
+  void listen<UpdateStateSnapshot>(EVENT_UPDATE_STATE, (event) => {
+    if (!disposed && event.payload) {
+      onState(event.payload);
+    }
+  }).then((fn) => {
+    if (disposed) {
+      fn();
+    } else {
+      unlisten = fn;
+    }
+  });
+
+  return () => {
+    disposed = true;
+    if (unlisten) unlisten();
   };
 }

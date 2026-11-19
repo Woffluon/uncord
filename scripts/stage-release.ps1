@@ -102,7 +102,7 @@ $NsisDirs = @(
 $CopiedSetupNames = @{}
 foreach ($NsisDir in $NsisDirs) {
     if (Test-Path -LiteralPath $NsisDir) {
-        $Installers = @(Get-ChildItem -LiteralPath $NsisDir -Filter "*.exe" -File | Sort-Object LastWriteTimeUtc -Descending)
+        $Installers = @(Get-ChildItem -LiteralPath $NsisDir -Filter "uncord_${Version}_*.exe" -File | Sort-Object LastWriteTimeUtc -Descending)
         foreach ($Installer in $Installers) {
             if (-not $CopiedSetupNames.ContainsKey($Installer.Name)) {
                 Copy-Item -LiteralPath $Installer.FullName -Destination (Join-Path $OutDir $Installer.Name) -Force
@@ -112,7 +112,11 @@ foreach ($NsisDir in $NsisDirs) {
     }
 }
 
-$StagedFiles = @(Get-ChildItem -LiteralPath $OutDir -File | Where-Object { $_.Name -notlike "*-SHA256SUMS.txt" } | Sort-Object Name)
+$StagedFiles = @(
+    Get-ChildItem -LiteralPath $OutDir -File |
+        Where-Object { $_.Name -notlike "*-SHA256SUMS.txt" -and $_.Name -ne "latest.json" -and $_.Name -ne "latest.json.sig" } |
+        Sort-Object Name
+)
 if ($StagedFiles.Count -eq 0) {
     throw "No release artifacts were staged in $OutDir"
 }
@@ -127,7 +131,33 @@ $ChecksumFile = Join-Path $OutDir "uncord-v$Version-SHA256SUMS.txt"
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 [System.IO.File]::WriteAllText($ChecksumFile, (($ChecksumLines -join "`n") + "`n"), $Utf8NoBom)
 
+$InstallerName = "uncord_${Version}_x64-setup.exe"
+$InstallerStagedPath = Join-Path $OutDir $InstallerName
+if (Test-Path -LiteralPath $InstallerStagedPath) {
+    $InstallerItem = Get-Item -LiteralPath $InstallerStagedPath
+    $InstallerHash = (Get-FileHash -LiteralPath $InstallerStagedPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    $Tag = "v$Version"
+    $ReleaseRepo = if (-not [string]::IsNullOrWhiteSpace($env:GITHUB_REPOSITORY)) { $env:GITHUB_REPOSITORY } else { "Woffluon/uncord" }
+    $ManifestObject = [ordered]@{
+        schemaVersion = 1
+        version       = $Version
+        publishedAt   = [DateTimeOffset]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+        releaseUrl    = "https://github.com/$ReleaseRepo/releases/tag/$Tag"
+        releaseNotes  = "uncord $Tag release"
+        installer     = [ordered]@{
+            url    = "https://github.com/$ReleaseRepo/releases/download/$Tag/$InstallerName"
+            sha256 = $InstallerHash
+            size   = [int64]$InstallerItem.Length
+        }
+    }
+    $ManifestJson = ($ManifestObject | ConvertTo-Json -Depth 4) -replace "`r`n", "`n"
+    [System.IO.File]::WriteAllText((Join-Path $OutDir "latest.json"), "$ManifestJson`n", $Utf8NoBom)
+}
+
 Write-Host "Staged release artifacts in ${OutDir}:" -ForegroundColor Green
 foreach ($Line in $ChecksumLines) {
     Write-Host "  $Line"
+}
+if (Test-Path -LiteralPath (Join-Path $OutDir "latest.json")) {
+    Write-Host "  manifest: latest.json" -ForegroundColor Green
 }

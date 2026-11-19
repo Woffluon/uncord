@@ -5,11 +5,13 @@ import type {
   EngineSnapshot,
   RouteConfig,
   RouteTelemetry,
+  UpdateStateSnapshot,
 } from "./lib/ipc";
 import {
   audioClient,
   subscribeDeviceChanges,
   subscribeTelemetry,
+  subscribeUpdateState,
 } from "./lib/audioClient";
 import {
   computeAggregateSoftwareLatency,
@@ -20,6 +22,7 @@ import { HeaderBar } from "./components/HeaderBar";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { RouteCard } from "./components/RouteCard";
 import { SettingsDrawer } from "./components/SettingsDrawer";
+import { UpdateBanner } from "./components/UpdateBanner";
 
 const TOUR_STORAGE_KEY = "uncord.tour.v1";
 
@@ -65,6 +68,9 @@ export function App() {
   const [instantRouteIds, setInstantRouteIds] = useState<Set<string>>(() => new Set());
   const [instantMuteRouteId, setInstantMuteRouteId] = useState<string | null>(null);
   const [instantUiFlag, setInstantUiFlag] = useState(false);
+  const [updateState, setUpdateState] = useState<UpdateStateSnapshot | null>(null);
+  const [dismissedUpdateVersion, setDismissedUpdateVersion] = useState<string | null>(null);
+  const [dismissedUpdateError, setDismissedUpdateError] = useState<string | null>(null);
 
   // 60fps Canvas VU Meters read directly from telemetryMapRef (ZERO React re-render per frame)
   const telemetryMapRef = useRef<Map<string, RouteTelemetry>>(new Map());
@@ -91,6 +97,7 @@ export function App() {
 
   useEffect(() => {
     void refreshSnapshot();
+    void audioClient.getUpdateState().then(setUpdateState).catch(() => {});
     void audioClient
       .getTelemetry()
       .then((items) => {
@@ -154,6 +161,45 @@ export function App() {
       window.removeEventListener("focus", handleFocus);
     };
   }, [refreshSnapshot]);
+
+  useEffect(() => {
+    return subscribeUpdateState((next) => {
+      setUpdateState(next);
+    });
+  }, []);
+
+  const handleCheckUpdates = useCallback(() => {
+    setDismissedUpdateVersion(null);
+    setDismissedUpdateError(null);
+    void audioClient.checkForUpdates().then(setUpdateState).catch((err) => {
+      setErrorBanner(toErrorMessage(err));
+    });
+  }, []);
+
+  const handleCancelUpdate = useCallback(() => {
+    void audioClient.cancelUpdateCheck().then(setUpdateState).catch((err) => {
+      setErrorBanner(toErrorMessage(err));
+    });
+  }, []);
+
+  const handleDownloadUpdate = useCallback(() => {
+    setDismissedUpdateError(null);
+    void audioClient.downloadUpdate().then(setUpdateState).catch((err) => {
+      setErrorBanner(toErrorMessage(err));
+    });
+  }, []);
+
+  const handleInstallUpdate = useCallback(() => {
+    void audioClient.installUpdate().catch((err) => {
+      setErrorBanner(toErrorMessage(err));
+    });
+  }, []);
+
+  const handleOpenReleasePage = useCallback(() => {
+    void audioClient.openReleasePage().catch((err) => {
+      setErrorBanner(toErrorMessage(err));
+    });
+  }, []);
 
   const handleAddRoute = useCallback(
     async (opts?: { instant?: boolean }) => {
@@ -466,6 +512,25 @@ export function App() {
       />
 
       <main className="flex-1 w-full max-w-[1120px] mx-auto px-4 sm:px-5 py-4 flex flex-col gap-3.5">
+        {updateState && (
+          <UpdateBanner
+            state={updateState}
+            dismissedVersion={dismissedUpdateVersion}
+            dismissedError={dismissedUpdateError}
+            onDismiss={() => {
+              if (updateState.status === "error") {
+                setDismissedUpdateError(updateState.errorMessage ?? "Update check failed");
+              } else {
+                setDismissedUpdateVersion(updateState.availableVersion);
+              }
+            }}
+            onDownload={handleDownloadUpdate}
+            onInstall={handleInstallUpdate}
+            onCancel={handleCancelUpdate}
+            onOpenRelease={handleOpenReleasePage}
+          />
+        )}
+
         {errorBanner && (
           <div
             role="alert"
@@ -559,9 +624,15 @@ export function App() {
           open={settingsOpen}
           version={snapshot.version}
           settings={snapshot.settings}
+          updateState={updateState}
           onClose={() => setSettingsOpen(false)}
           onUpdateSettings={(next) => void handleUpdateSettings(next)}
           onReplayTour={() => setTourOpen(true)}
+          onCheckUpdates={handleCheckUpdates}
+          onCancelUpdate={handleCancelUpdate}
+          onDownloadUpdate={handleDownloadUpdate}
+          onInstallUpdate={handleInstallUpdate}
+          onOpenReleasePage={handleOpenReleasePage}
         />
       )}
 

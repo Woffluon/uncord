@@ -131,6 +131,10 @@ pub struct Profile {
     pub routes: Vec<RouteConfig>,
 }
 
+fn default_true() -> bool {
+    true
+}
+
 /// Persistent application settings.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -138,6 +142,8 @@ pub struct AppSettings {
     pub minimize_to_tray_on_close: bool,
     pub start_minimized: bool,
     pub auto_reconnect: bool,
+    #[serde(default = "default_true")]
+    pub update_checks_enabled: bool,
     pub active_profile_id: Option<String>,
     pub theme: String,
 }
@@ -148,6 +154,7 @@ impl Default for AppSettings {
             minimize_to_tray_on_close: true,
             start_minimized: false,
             auto_reconnect: true,
+            update_checks_enabled: true,
             active_profile_id: None,
             theme: "dark".to_string(),
         }

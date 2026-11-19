@@ -1,4 +1,4 @@
-pub const VERSION: &str = "0.1.0";
+pub const VERSION: &str = "0.2.0";
 
 pub mod backend;
 pub mod dsp;

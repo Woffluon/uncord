@@ -12,6 +12,7 @@ use uncord_core::types::{
 
 pub mod ipc;
 pub mod tray;
+pub mod updater;
 
 pub const MAIN_WINDOW_LABEL: &str = "main";
 
@@ -253,6 +254,23 @@ pub fn run() {
                 Arc::clone(&lifecycle),
             );
 
+            let updater = updater::AppUpdater::start(app.handle().clone());
+            app.manage(Arc::clone(&updater));
+
+            if snapshot.settings.update_checks_enabled {
+                let app_for_update = app.handle().clone();
+                let updater_for_startup = Arc::clone(&updater);
+                let lifecycle_for_startup = Arc::clone(&lifecycle);
+                let _ = std::thread::Builder::new()
+                    .name("uncord-update-startup".to_string())
+                    .spawn(move || {
+                        std::thread::sleep(Duration::from_millis(1500));
+                        if !lifecycle_for_startup.is_quitting.load(Ordering::SeqCst) {
+                            let _ = updater_for_startup.check_for_updates(&app_for_update);
+                        }
+                    });
+            }
+
             let arg_flag = if start_minimized_arg {
                 ["--start-minimized"].as_slice()
             } else {
@@ -305,6 +323,12 @@ pub fn run() {
             ipc::delete_profile,
             ipc::update_settings,
             ipc::get_telemetry,
+            ipc::get_update_state,
+            ipc::check_for_updates,
+            ipc::cancel_update_check,
+            ipc::download_update,
+            ipc::install_update,
+            ipc::open_release_page,
         ])
         .build(tauri::generate_context!())
     {
@@ -327,6 +351,9 @@ pub fn run() {
         RunEvent::Exit => {
             if let Some(lifecycle) = app_handle.try_state::<Arc<AppLifecycleState>>() {
                 lifecycle.telemetry_stop.store(true, Ordering::SeqCst);
+            }
+            if let Some(updater) = app_handle.try_state::<Arc<updater::AppUpdater>>() {
+                updater.shutdown();
             }
             if let Some(engine) = app_handle.try_state::<Arc<UncordEngine>>() {
                 engine.shutdown();

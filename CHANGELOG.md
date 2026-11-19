@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-11-20
+
+### Added
+- **Cryptographic Auto-Updater (`src-tauri/src/updater/`, `assets/update-public-key.hex`)**:
+  - Added startup and manual GitHub Release update checks (`latest.json` + `latest.json.sig`) using strict raw Ed25519 signature verification before JSON parsing.
+  - Enforced HTTPS-only transport with no automatic redirects outside `github.com/Woffluon/uncord/*` and GitHub release object hosts, bounded retry backoff, and cancellation support.
+  - Added atomic downloads to `%LOCALAPPDATA%\uncord\Updates\`, SHA-256 verification, Win32 PE `FileVersion` validation, and read-only launch locking before starting `uncord_<version>_x64-setup.exe`.
+- **Updater UI & IPC (`src-tauri/src/ipc.rs`, `src/components/UpdateBanner.tsx`, `src/components/SettingsDrawer.tsx`)**:
+  - Exposed `get_update_state`, `check_for_updates`, `cancel_update_check`, `download_update`, `install_update`, `open_release_page`, and `uncord://update-state` events (only emitted while the main window is alive, preserving background tray RAM budgets).
+  - Added `Auto-check updates` (`updateChecksEnabled`) setting in `uncord-core::AppSettings` and Settings drawer controls alongside a dismissible top `UpdateBanner` with download progress.
+- **Release Signing Pipeline (`scripts/`, `.github/workflows/release.yml`, `ci.yml`)**:
+  - Added OpenSSL 3 Ed25519 signing/verification (`scripts/update-manifest-signature.ps1`), manifest validation (`scripts/test-release-manifest.ps1`), and `latest.json` generation in `scripts/stage-release.ps1`, plus CI and release signing gates using `UPDATE_MANIFEST_PRIVATE_KEY_BASE64`.
+
 ## [0.1.0] - 2026-11-19
 
 ### Added

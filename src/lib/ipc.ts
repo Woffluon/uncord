@@ -3,6 +3,29 @@ import { invoke } from "@tauri-apps/api/core";
 export const EVENT_TELEMETRY = "uncord://telemetry";
 export const EVENT_DEVICES_CHANGED = "uncord://devices-changed";
 export const EVENT_ROUTE_STATUS = "uncord://route-status";
+export const EVENT_UPDATE_STATE = "uncord://update-state";
+
+export type UpdateStatusKind =
+  | "ready"
+  | "checking"
+  | "upToDate"
+  | "available"
+  | "downloading"
+  | "verified"
+  | "installing"
+  | "error";
+
+export interface UpdateStateSnapshot {
+  status: UpdateStatusKind;
+  currentVersion: string;
+  availableVersion: string | null;
+  releaseUrl: string | null;
+  releaseNotes: string | null;
+  downloadedBytes: number;
+  totalBytes: number;
+  verifying: boolean;
+  errorMessage: string | null;
+}
 
 export type DeviceFlow = "capture" | "render" | "loopback";
 
@@ -92,6 +115,7 @@ export interface AppSettings {
   autoReconnect: boolean;
   activeProfileId: string | null;
   theme: string;
+  updateChecksEnabled: boolean;
 }
 
 export interface EngineSnapshot {
@@ -135,4 +159,10 @@ export const uncordIpc = {
   updateSettings: (settings: AppSettings): Promise<AppSettings> =>
     invoke("update_settings", { settings }),
   getTelemetry: (): Promise<RouteTelemetry[]> => invoke("get_telemetry"),
+  getUpdateState: (): Promise<UpdateStateSnapshot> => invoke("get_update_state"),
+  checkForUpdates: (): Promise<UpdateStateSnapshot> => invoke("check_for_updates"),
+  cancelUpdateCheck: (): Promise<UpdateStateSnapshot> => invoke("cancel_update_check"),
+  downloadUpdate: (): Promise<UpdateStateSnapshot> => invoke("download_update"),
+  installUpdate: (): Promise<void> => invoke("install_update"),
+  openReleasePage: (): Promise<void> => invoke("open_release_page"),
 };

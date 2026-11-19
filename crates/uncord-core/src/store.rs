@@ -124,6 +124,7 @@ mod tests {
                 minimize_to_tray_on_close: true,
                 start_minimized: true,
                 auto_reconnect: true,
+                update_checks_enabled: true,
                 active_profile_id: Some("p1".into()),
                 theme: "light".into(),
             },

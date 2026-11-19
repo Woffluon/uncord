@@ -51,8 +51,14 @@ $ReleaseTarget = (& git -C $RepoRoot rev-parse "$($Release.target_commitish)^{co
 if ($LASTEXITCODE -ne 0 -or $ReleaseTarget -cne $ReleaseSha) { throw "Existing release target does not match $ReleaseSha." }
 
 $PortableZip = "uncord-v$Version-windows-x64-portable.zip"
+$ExpectedSetup = "uncord_${Version}_x64-setup.exe"
 $VersionedChecksums = "uncord-v$Version-SHA256SUMS.txt"
-$Required = @($PortableZip, $VersionedChecksums)
+$RequiresSignedManifest = ([version]$Version -ge [version]"0.2.0")
+$Required = if ($RequiresSignedManifest) {
+    @($PortableZip, $ExpectedSetup, $VersionedChecksums, "latest.json", "latest.json.sig")
+} else {
+    @($PortableZip, $VersionedChecksums)
+}
 $EscapedVersion = [regex]::Escape($Version)
 $SetupRegex = "^(?:uncord_${EscapedVersion}_[^\\/]+-setup|uncord-v${EscapedVersion}-windows-[^\\/]+-setup)\.exe$"
 
@@ -61,13 +67,13 @@ $Names = @($Assets | ForEach-Object { $_.name })
 $Missing = @($Required | Where-Object { $_ -notin $Names })
 if ($Missing.Count -gt 0) { throw "Existing immutable release is incomplete: $($Missing -join ', ')" }
 
-$OptionalSetupAssets = @($Names | Where-Object { $_ -match $SetupRegex })
+$OptionalSetupAssets = @($Names | Where-Object { $_ -match $SetupRegex -and $_ -notin $Required })
 $Allowed = @($Required + $OptionalSetupAssets)
 $Unexpected = @($Names | Where-Object { $_ -notin $Allowed })
 if ($Unexpected.Count -gt 0) { throw "Existing immutable release contains unexpected assets: $($Unexpected -join ', ')" }
 
-$AssetsToVerify = @($PortableZip) + @($OptionalSetupAssets) + @($VersionedChecksums)
-$PayloadAssets = @($PortableZip) + @($OptionalSetupAssets)
+$AssetsToVerify = @($Required) + @($OptionalSetupAssets)
+$PayloadAssets = @($PortableZip) + @($Names | Where-Object { $_ -match $SetupRegex })
 
 $BytesByName = @{}
 $HashByName = @{}
@@ -119,6 +125,30 @@ foreach ($PayloadName in $PayloadAssets) {
 }
 if ($VersionedMap.Count -ne $PayloadAssets.Count) {
     throw "Versioned checksum manifest entries ($($VersionedMap.Count)) do not match published payload assets ($($PayloadAssets.Count))."
+}
+
+if ($RequiresSignedManifest) {
+    $Manifest = [Text.Encoding]::UTF8.GetString($BytesByName["latest.json"]) | ConvertFrom-Json
+    $ExpectedInstallerUrl = "https://github.com/$Repository/releases/download/$ReleaseTag/$ExpectedSetup"
+    if ($Manifest.schemaVersion -ne 1 -or $Manifest.version -cne $Version -or $Manifest.releaseUrl -cne "https://github.com/$Repository/releases/tag/$ReleaseTag") {
+        throw "latest.json release identity does not match existing release."
+    }
+    if ($Manifest.installer.url -cne $ExpectedInstallerUrl -or $Manifest.installer.sha256 -cne $HashByName[$ExpectedSetup] -or $Manifest.installer.size -ne $BytesByName[$ExpectedSetup].Length) {
+        throw "latest.json installer metadata does not match release assets."
+    }
+
+    $SignatureDirectory = Join-Path ([IO.Path]::GetTempPath()) ("uncord-release-signature-" + [Guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path $SignatureDirectory | Out-Null
+    try {
+        $ManifestPath = Join-Path $SignatureDirectory "latest.json"
+        $SignaturePath = Join-Path $SignatureDirectory "latest.json.sig"
+        [IO.File]::WriteAllBytes($ManifestPath, $BytesByName["latest.json"])
+        [IO.File]::WriteAllBytes($SignaturePath, $BytesByName["latest.json.sig"])
+        & (Join-Path $RepoRoot "scripts\update-manifest-signature.ps1") -Action Verify -ManifestPath $ManifestPath -SignaturePath $SignaturePath
+        if ($LASTEXITCODE -ne 0) { throw "Existing release manifest signature is invalid." }
+    } finally {
+        Remove-Item -LiteralPath $SignatureDirectory -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 if (-not $NoOutput -and $env:GITHUB_OUTPUT) { "needed=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append }

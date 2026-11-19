@@ -9,6 +9,7 @@ use uncord_core::types::{
     RouteTelemetry,
 };
 
+use crate::updater::{AppUpdater, UpdateStateSnapshot};
 use crate::{tray, AppLifecycleState};
 
 pub const EVENT_TELEMETRY: &str = "uncord://telemetry";
@@ -271,6 +272,67 @@ pub async fn update_settings(
 #[tauri::command]
 pub fn get_telemetry(engine: State<'_, Arc<UncordEngine>>) -> Result<Vec<RouteTelemetry>, String> {
     UncordIpcContract::get_telemetry(engine.inner().as_ref())
+}
+
+/// Returns the current cryptographic auto-updater state snapshot.
+#[tauri::command]
+pub fn get_update_state(updater: State<'_, Arc<AppUpdater>>) -> UpdateStateSnapshot {
+    updater.snapshot()
+}
+
+/// Starts a background check against the signed GitHub Release manifest.
+#[tauri::command]
+pub fn check_for_updates(
+    app: AppHandle,
+    updater: State<'_, Arc<AppUpdater>>,
+) -> UpdateStateSnapshot {
+    updater.check_for_updates(&app)
+}
+
+/// Cancels any active update check or installer download.
+#[tauri::command]
+pub fn cancel_update_check(
+    app: AppHandle,
+    updater: State<'_, Arc<AppUpdater>>,
+) -> UpdateStateSnapshot {
+    updater.cancel_active(&app)
+}
+
+/// Downloads and cryptographically verifies the installer for the available update.
+#[tauri::command]
+pub fn download_update(
+    app: AppHandle,
+    updater: State<'_, Arc<AppUpdater>>,
+) -> Result<UpdateStateSnapshot, String> {
+    updater.download_update(&app)
+}
+
+/// Launches the verified NSIS installer and shuts down the engine cleanly for replacement.
+#[tauri::command]
+pub async fn install_update(
+    app: AppHandle,
+    updater: State<'_, Arc<AppUpdater>>,
+    lifecycle: State<'_, Arc<AppLifecycleState>>,
+    engine: State<'_, Arc<UncordEngine>>,
+) -> Result<(), String> {
+    let updater_arc = Arc::clone(updater.inner());
+    let app_for_install = app.clone();
+    tauri::async_runtime::spawn_blocking(move || updater_arc.install_update(&app_for_install))
+        .await
+        .map_err(|err| format!("Update install task failed: {err}"))??;
+
+    lifecycle.is_quitting.store(true, Ordering::SeqCst);
+    lifecycle.telemetry_stop.store(true, Ordering::SeqCst);
+    let engine_arc = Arc::clone(engine.inner());
+    let _ = tauri::async_runtime::spawn_blocking(move || engine_arc.shutdown()).await;
+    app.exit(0);
+    Ok(())
+}
+
+/// Opens the verified GitHub release URL in the user's default browser.
+#[tauri::command]
+pub fn open_release_page(updater: State<'_, Arc<AppUpdater>>) -> Result<(), String> {
+    updater.open_release_page()
 }
 
 #[cfg(test)]
