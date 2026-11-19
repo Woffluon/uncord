@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
-  <title id="title">uncord — Air-Gap Signal Bridge symbol</title>
-  <g id="symbol" fill="#111111">
-    <path d="M 24 104 L 104 24 H 156 L 24 156 Z"/>
-    <path d="M 232 152 L 152 232 H 100 L 232 100 Z"/>
-    <path d="M 102 112 H 186 L 154 144 H 70 Z"/>
-  </g>
-</svg>
