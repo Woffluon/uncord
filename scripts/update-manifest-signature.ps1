@@ -5,11 +5,14 @@ param(
     [string]$ManifestPath,
     [string]$SignaturePath,
     [string]$PrivateKeyBase64 = $env:UPDATE_MANIFEST_PRIVATE_KEY_BASE64,
-    [string]$PublicKeyPath = (Join-Path $PSScriptRoot "..\assets\update-public-key.hex")
+    [string]$PublicKeyPath
 )
 
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = "Stop"
+
+$ScriptDir = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
+$PublicKeyPath = if ($PublicKeyPath) { $PublicKeyPath } else { Join-Path $ScriptDir "..\assets\update-public-key.hex" }
 
 $Ed25519SpkiHeader = [byte[]](0x30, 0x2a, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x03, 0x21, 0x00)
 
