@@ -8,9 +8,9 @@
 
 # uncord
 
-**Direct Windows audio routing without virtual cable clutter.**
+**User-space Windows WASAPI multi-route audio bridge (`<= 12 ms` software pipeline, `<= 25 MB` tray RAM).**
 
-Open-source, low-latency multi-route Windows WASAPI audio router with `<= 12 ms` software pipeline latency, adaptive clock-drift resampling, multi-channel USB-C splitting, a headless CLI daemon, and a `<= 25 MB` tray desktop studio.
+Routes capture inputs, multi-channel USB-C interfaces, and WASAPI loopback endpoints to one or more outputs with adaptive clock-drift resampling and a headless CLI.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-111214.svg?style=flat-square)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11%20x64-111214.svg?style=flat-square)](#quick-start)
@@ -94,23 +94,23 @@ flowchart LR
 
 ## Quick Start
 
-### 1. Desktop Studio (`uncord.exe`)
+### 1. Desktop App (`uncord.exe`)
 
-Download the latest Windows x64 portable archive (`uncord-v<version>-windows-x64-portable.zip`) or NSIS installer from [GitHub Releases](https://github.com/Woffluon/uncord/releases), or launch directly in tray mode:
+Download `uncord-v<version>-windows-x64-portable.zip` or the NSIS installer from [GitHub Releases](https://github.com/Woffluon/uncord/releases):
 
 ```powershell
-# Launch the desktop studio
+# Launch the desktop window
 .\uncord.exe
 
 # Start directly in the Windows system tray (no WebView2 window spawned at boot)
 .\uncord.exe --start-minimized
 ```
 
-Tray controls include **Show / Hide uncord**, **Quick Mute All**, **Profiles** switching, and **Quit uncord** (which performs clean `UncordEngine::shutdown()`).
+Tray controls include **Show / Hide uncord**, **Quick Mute All**, **Profiles** switching, and **Quit uncord** (which runs `UncordEngine::shutdown()`).
 
 ### 2. Headless CLI (`uncord-cli.exe`)
 
-Run background routes from PowerShell, Task Scheduler, or batch scripts without spawning any GUI window:
+Run background routes from PowerShell, Task Scheduler, or batch scripts without a GUI window:
 
 ```powershell
 # Inspect available capture, render, and loopback endpoints

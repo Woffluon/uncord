@@ -299,7 +299,7 @@ export function RouteCard({
         <div className="md:col-span-4 flex flex-col gap-2.5 min-w-0">
           <DeviceSelect
             mode="input"
-            label="Input Source"
+            label="Input"
             devices={devices}
             selectedDeviceId={route.sourceDeviceId}
             isOpen={openMenuKey === srcMenuKey}
@@ -321,7 +321,7 @@ export function RouteCard({
         <div className="md:col-span-4 flex flex-col gap-2.5 min-w-0">
           <DeviceSelect
             mode="output"
-            label="Output Target"
+            label="Output"
             devices={devices}
             selectedDeviceId={route.targetDeviceId}
             isOpen={openMenuKey === dstMenuKey}
@@ -336,7 +336,7 @@ export function RouteCard({
                 className="text-[10px] font-semibold uppercase tracking-[0.08em]"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Latency Mode
+                Latency
               </span>
               <button
                 type="button"
@@ -486,8 +486,7 @@ export function RouteCard({
               style={{ color: "var(--status-warning)" }}
             />
             <span>
-              <strong>Bluetooth Hands-Free (HFP / AG Audio)</strong> forces 8–16 kHz mono voice
-              quality. Disable the headset microphone or switch to Stereo A2DP for full bandwidth.
+              <strong>Bluetooth HFP</strong> limits audio to 8–16 kHz mono. Switch to Stereo A2DP.
             </span>
           </div>
           {a2dpCompanion && (

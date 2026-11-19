@@ -121,7 +121,7 @@ export function LatencyPopover({
                 className="text-[11px] font-semibold uppercase tracking-[0.08em]"
                 style={{ color: "var(--text-primary)" }}
               >
-                Pipeline vs Transport Floor
+                Latency
               </span>
               <span
                 className="font-mono-num text-[10px] px-1.5 py-0.5 rounded-[3px] font-semibold"
@@ -183,8 +183,7 @@ export function LatencyPopover({
               className="mt-2 text-[10px] leading-[1.4]"
               style={{ color: "var(--text-muted)" }}
             >
-              Physical wireless codec / DAC floor sits downstream of WASAPI and is reported
-              separately from software routing latency.
+              Transport floor is downstream of WASAPI.
             </p>
 
             <div

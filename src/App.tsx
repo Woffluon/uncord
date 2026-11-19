@@ -17,8 +17,11 @@ import {
 } from "./lib/audioUtils";
 import { EmptyState } from "./components/EmptyState";
 import { HeaderBar } from "./components/HeaderBar";
+import { OnboardingTour } from "./components/OnboardingTour";
 import { RouteCard } from "./components/RouteCard";
 import { SettingsDrawer } from "./components/SettingsDrawer";
+
+const TOUR_STORAGE_KEY = "uncord.tour.v1";
 
 function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -41,6 +44,22 @@ export function App() {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [openMenuKey, setOpenMenuKey] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem(TOUR_STORAGE_KEY) !== "done";
+    } catch {
+      return false;
+    }
+  });
+
+  const closeTour = useCallback(() => {
+    setTourOpen(false);
+    try {
+      window.localStorage.setItem(TOUR_STORAGE_KEY, "done");
+    } catch {
+      // Ignore storage errors in restricted WebView contexts
+    }
+  }, []);
 
   // Instant 0ms flags for keyboard-initiated actions (N, M, Esc)
   const [instantRouteIds, setInstantRouteIds] = useState<Set<string>>(() => new Set());
@@ -348,11 +367,12 @@ export function App() {
   useEffect(() => {
     const handleKeyDown = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (openMenuKey !== null || settingsOpen || errorBanner !== null) {
+        if (openMenuKey !== null || settingsOpen || tourOpen || errorBanner !== null) {
           e.preventDefault();
           setInstantUiFlag(true);
           setOpenMenuKey(null);
           setSettingsOpen(false);
+          if (tourOpen) closeTour();
           setErrorBanner(null);
           window.requestAnimationFrame(() => setInstantUiFlag(false));
         }
@@ -390,6 +410,8 @@ export function App() {
     selectedRouteId,
     openMenuKey,
     settingsOpen,
+    tourOpen,
+    closeTour,
     errorBanner,
     handleAddRoute,
     handleGainMuteChange,
@@ -515,31 +537,21 @@ export function App() {
         )}
       </main>
 
-      {/* Hardware Console Footer */}
+      {/* Minimal Status Footer */}
       <footer
-        className="border-t px-4 sm:px-5 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono-num"
+        className="border-t px-4 sm:px-5 py-2 flex items-center justify-between gap-2 text-[11px] font-mono-num"
         style={{
           backgroundColor: "var(--bg-app)",
           borderColor: "var(--border-subtle)",
           color: "var(--text-muted)",
         }}
       >
-        <div className="flex items-center gap-3">
-          <span>
-            {inputCount} inputs · {outputCount} outputs
-          </span>
-          <span>·</span>
-          <span>
-            {routes.filter((r) => r.enabled).length}/{routes.length} routes active
-          </span>
-        </div>
-
-        <div className="hidden sm:flex items-center gap-3">
-          <span>N new</span>
-          <span>M mute</span>
-          <span>Esc close</span>
-          <span>2×Click fader = 0 dB</span>
-        </div>
+        <span>
+          {inputCount} in · {outputCount} out
+        </span>
+        <span>
+          {routes.filter((r) => r.enabled).length}/{routes.length} active
+        </span>
       </footer>
 
       {snapshot && (
@@ -549,8 +561,11 @@ export function App() {
           settings={snapshot.settings}
           onClose={() => setSettingsOpen(false)}
           onUpdateSettings={(next) => void handleUpdateSettings(next)}
+          onReplayTour={() => setTourOpen(true)}
         />
       )}
+
+      <OnboardingTour open={tourOpen} onClose={closeTour} />
     </div>
   );
 }

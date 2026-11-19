@@ -1,7 +1,6 @@
 import { createPortal } from "react-dom";
 import { Moon, Sun, X } from "lucide-react";
 import type { AppSettings } from "../lib/ipc";
-import { isTauriRuntime } from "../lib/audioClient";
 
 interface SettingsDrawerProps {
   open: boolean;
@@ -9,6 +8,7 @@ interface SettingsDrawerProps {
   settings: AppSettings;
   onClose: () => void;
   onUpdateSettings: (next: AppSettings) => void;
+  onReplayTour: () => void;
 }
 
 function SettingSwitchRow({
@@ -68,6 +68,7 @@ export function SettingsDrawer({
   settings,
   onClose,
   onUpdateSettings,
+  onReplayTour,
 }: SettingsDrawerProps) {
   if (!open) return null;
 
@@ -100,10 +101,10 @@ export function SettingsDrawer({
           >
             <div>
               <h2 className="text-[14px] font-semibold" style={{ color: "var(--text-primary)" }}>
-                Console Settings
+                Settings
               </h2>
               <p className="font-mono-num text-[10px]" style={{ color: "var(--text-muted)" }}>
-                uncord v{version} · {isTauriRuntime() ? "WASAPI Native" : "Browser Preview"}
+                v{version}
               </p>
             </div>
             <button
@@ -123,8 +124,8 @@ export function SettingsDrawer({
 
           <div className="flex flex-col gap-2.5">
             <SettingSwitchRow
-              title="Close to Tray (Destroy WebView2 — ~8 MB RAM)"
-              description="Closing the window terminates the WebView2 UI process while the Rust audio engine keeps routing in the system tray."
+              title="Close to tray"
+              description="Terminates WebView2 on close while audio keeps running."
               checked={settings.minimizeToTrayOnClose}
               onToggle={() =>
                 onUpdateSettings({
@@ -135,8 +136,8 @@ export function SettingsDrawer({
             />
 
             <SettingSwitchRow
-              title="Auto-Reconnect Hot-Plug"
-              description="Automatically resume paused routes as soon as unplugged USB amps or Bluetooth headsets return."
+              title="Auto-reconnect"
+              description="Restores routes when USB or Bluetooth devices return."
               checked={settings.autoReconnect}
               onToggle={() =>
                 onUpdateSettings({
@@ -147,8 +148,8 @@ export function SettingsDrawer({
             />
 
             <SettingSwitchRow
-              title="Start Minimized"
-              description="Launch directly into the Windows system tray without spawning a desktop window."
+              title="Start minimized"
+              description="Launch directly to the system tray."
               checked={settings.startMinimized}
               onToggle={() =>
                 onUpdateSettings({
@@ -165,7 +166,7 @@ export function SettingsDrawer({
               className="text-[10px] font-semibold uppercase tracking-[0.08em]"
               style={{ color: "var(--text-secondary)" }}
             >
-              Chassis Finish
+              Theme
             </span>
             <div
               className="grid grid-cols-2 gap-1.5 p-1 rounded-[7px] border"
@@ -186,7 +187,7 @@ export function SettingsDrawer({
                 }}
               >
                 <Moon size={13} />
-                <span>Obsidian Dark</span>
+                <span>Dark</span>
               </button>
               <button
                 type="button"
@@ -200,7 +201,7 @@ export function SettingsDrawer({
                 }}
               >
                 <Sun size={13} />
-                <span>Studio Chalk</span>
+                <span>Light</span>
               </button>
             </div>
           </div>
@@ -263,12 +264,22 @@ export function SettingsDrawer({
           </div>
         </div>
 
-        <div
-          className="pt-3 mt-4 border-t font-mono-num text-[10px] flex items-center justify-between"
-          style={{ borderColor: "var(--border-subtle)", color: "var(--text-muted)" }}
-        >
-          <span>Woffluon uncord</span>
-          <span>0-alloc audio hot-path</span>
+        <div className="pt-3 mt-4 border-t" style={{ borderColor: "var(--border-subtle)" }}>
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onReplayTour();
+            }}
+            className="tactile-btn hover-surface w-full py-1.5 px-3 rounded-[6px] border text-[12px] font-medium"
+            style={{
+              backgroundColor: "var(--bg-well)",
+              borderColor: "var(--border-subtle)",
+              color: "var(--text-secondary)",
+            }}
+          >
+            Show quick tour
+          </button>
         </div>
       </aside>
     </div>,

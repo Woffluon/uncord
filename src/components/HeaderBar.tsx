@@ -1,6 +1,5 @@
 import { Moon, Plus, Settings, Sun } from "lucide-react";
 import type { Profile } from "../lib/ipc";
-import { isTauriRuntime } from "../lib/audioClient";
 import { BrandMark } from "./BrandMark";
 import { ProfilePopover } from "./ProfilePopover";
 
@@ -42,14 +41,13 @@ export function HeaderBar({
   onOpenSettings,
 }: HeaderBarProps) {
   const isDark = theme !== "light";
-  const inPreview = !isTauriRuntime();
 
   const swLabel =
     activeCount === 0
-      ? "SW STANDBY"
+      ? "Standby"
       : maxSoftwareMs !== null
-        ? `SW ${maxSoftwareMs.toFixed(1)} ms`
-        : "SW -- ms";
+        ? `${maxSoftwareMs.toFixed(1)} ms`
+        : "-- ms";
 
   const dotColor =
     activeCount === 0
@@ -84,20 +82,6 @@ export function HeaderBar({
           />
           <span>{swLabel}</span>
         </div>
-
-        {inPreview && (
-          <span
-            className="hidden md:inline-flex font-mono-num text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] border"
-            title="Running in browser preview with simulated WASAPI devices"
-            style={{
-              backgroundColor: "var(--accent-signal-soft)",
-              borderColor: "var(--accent-signal-border)",
-              color: "var(--accent-signal)",
-            }}
-          >
-            PREVIEW
-          </span>
-        )}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
@@ -127,14 +111,14 @@ export function HeaderBar({
           }}
         >
           <Plus size={14} />
-          <span>New Route</span>
+          <span>Route</span>
         </button>
 
         <button
           type="button"
           onClick={onToggleTheme}
-          aria-label={isDark ? "Switch to Studio Chalk Light theme" : "Switch to Obsidian Dark theme"}
-          title={isDark ? "Studio Chalk Light" : "Obsidian Dark"}
+          aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+          title={isDark ? "Light" : "Dark"}
           className="tactile-btn hover-surface p-1.5 rounded-[6px] border"
           style={{
             backgroundColor: "var(--bg-panel)",

@@ -8,9 +8,9 @@
 
 # uncord
 
-**Sanal kablo karmaşası olmadan doğrudan Windows ses yönlendirmesi.**
+**Kullanıcı alanında çalışan Windows WASAPI çoklu ses yönlendiricisi (`<= 12 ms` yazılım gecikmesi, `<= 25 MB` tepsi belleği).**
 
-`<= 12 ms` yazılım hattı gecikmesi, adaptif saat-kayması yeniden örnekleyicisi, çok kanallı USB-C ayırma, başsız (headless) CLI servisi ve `<= 25 MB` sistem tepsisi RAM tüketimine sahip açık kaynaklı Windows WASAPI ses yönlendiricisi.
+Yakalama girişlerini, çok kanallı USB-C arayüzlerini ve WASAPI loopback uç noktalarını adaptif saat-kayması yeniden örnekleyicisiyle bir veya daha fazla çıkışa bağlar; başsız CLI içerir.
 
 [![Lisans: MIT](https://img.shields.io/badge/Lisans-MIT-111214.svg?style=flat-square)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows%2010%2F11%20x64-111214.svg?style=flat-square)](#hızlı-başlangıç)
@@ -94,19 +94,19 @@ flowchart LR
 
 ## Hızlı Başlangıç
 
-### 1. Masaüstü Stüdyosu (`uncord.exe`)
+### 1. Masaüstü Uygulaması (`uncord.exe`)
 
-[GitHub Releases](https://github.com/Woffluon/uncord/releases) üzerinden güncel Windows x64 taşınabilir paketini (`uncord-v<version>-windows-x64-portable.zip`) veya NSIS kurulum dosyasını indirin ya da doğrudan sistem tepsisinde başlatın:
+[GitHub Releases](https://github.com/Woffluon/uncord/releases) üzerinden `uncord-v<version>-windows-x64-portable.zip` paketini veya NSIS kurulum dosyasını indirin:
 
 ```powershell
-# Masaüstü stüdyosunu başlat
+# Masaüstü penceresini başlat
 .\uncord.exe
 
 # Doğrudan Windows sistem tepsisinde başlat (başlangıçta WebView2 penceresi oluşturulmaz)
 .\uncord.exe --start-minimized
 ```
 
-Tepsi menüsü **Show / Hide uncord**, **Quick Mute All**, **Profiles** geçişi ve temiz `UncordEngine::shutdown()` çağrısı yapan **Quit uncord** seçeneklerini içerir.
+Tepsi menüsü **Show / Hide uncord**, **Quick Mute All**, **Profiles** geçişi ve `UncordEngine::shutdown()` çağrısı yapan **Quit uncord** seçeneklerini içerir.
 
 ### 2. Başsız CLI (`uncord-cli.exe`)
 

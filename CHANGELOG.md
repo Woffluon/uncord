@@ -19,9 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Persistent atomic JSON configuration and routing profiles (`store.rs`) plus `IMMNotificationClient` hot-plug auto-reconnect.
 - **Headless CLI (`crates/uncord-cli`)**:
   - Added `--version`, `--list-devices [--json]`, `--headless --profile <name>`, and direct CLI route flags (`--source`, `--target`, `--channels`, `--gain-db`, `--loopback`, `--exclusive`, `--latency`).
-- **Tauri v2 Desktop Studio & System Tray (`src-tauri`, `src`)**:
+- **Tauri v2 Desktop App & System Tray (`src-tauri`, `src`)**:
   - Added frozen IPC contract (`UncordIpcContract` / `uncordIpc`) with `~30 Hz` live telemetry (`uncord://telemetry`), hot-plug device change notifications (`uncord://devices-changed`), and route status updates.
   - Implemented WebView2 process destruction (`window.destroy()`) on close-to-tray and `--start-minimized` startup so background tray memory remains `<= 25 MB`.
-  - Built React 19 + Tailwind v4 studio UI in Obsidian Dark and Studio Chalk themes with 60fps `<canvas>` Peak/RMS VU meters, per-route gain/mute/channel/latency controls, Bluetooth HFP inline warnings, and profile management.
+  - Built React 19 + Tailwind v4 UI in Dark and Light themes with 60fps `<canvas>` Peak/RMS VU meters, per-route gain/mute/channel/latency controls, Bluetooth HFP inline warnings, profile management, and a 3-step first-launch tour.
 - **Brand Identity, Verification & Immutable Release Pipeline**:
   - Added Hardware Port brand identity assets (`brand/`), Windows Tauri/web icons (`src-tauri/icons/`, `public/icons/`), bilingual documentation (`README.md` / `README.tr.md`), version sync & doc gate scripts (`scripts/`), and pinned-SHA GitHub Actions CI & immutable release workflows (`.github/workflows/`).

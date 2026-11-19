@@ -26,23 +26,15 @@ export function EmptyState({ devices, onQuickStart }: EmptyStateProps) {
         borderColor: "var(--border-subtle)",
       }}
     >
-      <div className="flex flex-col gap-1.5 max-w-[600px]">
-        <span
-          className="font-mono-num text-[10px] font-semibold uppercase tracking-[0.1em]"
-          style={{ color: "var(--accent-signal)" }}
-        >
-          Signal Matrix Ready
-        </span>
+      <div className="flex flex-col gap-1.5 max-w-[520px]">
         <h2
           className="text-[18px] font-semibold tracking-[-0.02em]"
           style={{ color: "var(--text-primary)" }}
         >
-          No active audio routes
+          No routes
         </h2>
         <p className="text-[13px] leading-[1.55]" style={{ color: "var(--text-secondary)" }}>
-          Patch any USB instrument interface, microphone, or desktop WASAPI loopback directly
-          into wired monitors, 2.4 GHz wireless, or Bluetooth A2DP headphones with adaptive drift
-          compensation.
+          Route any capture or loopback input to one or more outputs.
         </p>
       </div>
 
@@ -99,7 +91,7 @@ export function EmptyState({ devices, onQuickStart }: EmptyStateProps) {
             }}
           >
             <Zap size={13} />
-            <span>One-Click Quick Start</span>
+            <span>Quick Start</span>
           </button>
         </div>
       ) : (
@@ -114,21 +106,6 @@ export function EmptyState({ devices, onQuickStart }: EmptyStateProps) {
           Connect at least one capture/loopback input and one render output device.
         </div>
       )}
-
-      <div className="flex items-center gap-2 text-[11px] font-mono-num" style={{ color: "var(--text-muted)" }}>
-        <span>Shortcut:</span>
-        <kbd
-          className="px-1.5 py-0.5 rounded-[4px] border text-[10px]"
-          style={{
-            backgroundColor: "var(--bg-well)",
-            borderColor: "var(--border-subtle)",
-            color: "var(--text-secondary)",
-          }}
-        >
-          N
-        </kbd>
-        <span>creates a new route immediately</span>
-      </div>
     </section>
   );
 }
