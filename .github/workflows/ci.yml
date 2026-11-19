@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    name: Build, Tests & Release Staging (windows-x64)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Verify Rust toolchain
+        shell: pwsh
+        run: |
+          rustc --version
+          cargo --version
+          rustup component add clippy
+
+      - name: Verify Version & Documentation Contracts
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          pwsh -File scripts/test-versioning.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -File scripts/test-verify-docs.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -File scripts/validate-version.ps1 -CommitSha $env:TARGET_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($env:EVENT_NAME -eq "pull_request" -and $env:PR_BASE_SHA) {
+            pwsh -File scripts/verify-docs.ps1 -Base $env:PR_BASE_SHA
+          } else {
+            pwsh -File scripts/verify-docs.ps1 -CommitSha $env:TARGET_SHA
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck frontend
+        run: pnpm typecheck
+
+      - name: Build frontend bundle
+        run: pnpm build
+
+      - name: Run Rust workspace tests
+        run: cargo test --workspace
+
+      - name: Enforce zero Clippy warnings
+        run: cargo clippy --workspace -- -D warnings
+
+      - name: Run clock-drift and software latency benchmark
+        run: cargo test -p uncord-core --release -- --nocapture bench_pipeline_latency_and_drift
+
+      - name: Build release CLI binary
+        run: cargo build --release -p uncord-cli
+
+      - name: Build Tauri v2 desktop app & NSIS installer
+        run: pnpm tauri build
+
+      - name: Stage Windows release artifacts & SHA-256 checksums
+        shell: pwsh
+        run: |
+          pwsh -File scripts/stage-release.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: uncord-CI-Build-windows-x64
+          path: artifacts/*

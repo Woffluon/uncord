@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="984" viewBox="0 0 1600 984"><defs><filter id="grey"><feColorMatrix type="saturate" values="0"/></filter></defs><rect width="1600" height="984" fill="#f7f7f4"/><text x="60" y="78" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="40" font-weight="700" fill="#161616">Logo concepts</text><text x="60" y="116" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="20" fill="#6b6b6b">Concepts for review — pick a direction (or tell me what you like in each).</text><rect x="60" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="90" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c0-title">uncord — Open Jack u symbol</title>
+  <g id="c0-symbol" fill="#111111">
+    <path d="M 32 24 H 88 V 64 H 32 Z M 32 88 H 88 V 136 A 40 40 0 0 0 168 136 V 104 H 224 V 136 A 96 96 0 0 1 32 136 Z"/>
+    <circle cx="196" cy="52" r="28"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 960 256" x="90" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <title id="l0-title">uncord — Open Jack u horizontal lockup</title>
+  <g id="l0-symbol" fill="#111111">
+    <path d="M 32 24 H 88 V 64 H 32 Z M 32 88 H 88 V 136 A 40 40 0 0 0 168 136 V 104 H 224 V 136 A 96 96 0 0 1 32 136 Z"/>
+    <circle cx="196" cy="52" r="28"/>
+  </g>
+  <g id="l0-wordmark" fill="#111111">
+    <path d="M 276 74 H 298 V 142 A 24 28 0 0 0 346 142 V 74 H 368 V 188 H 346 V 171 C 340 184 330 190 317 190 C 292 190 276 172 276 142 Z"/>
+    <path d="M 392 74 H 414 V 91 C 420 78 430 72 443 72 C 468 72 484 90 484 120 V 188 H 462 V 120 A 24 28 0 0 0 414 120 V 188 H 392 Z"/>
+    <path d="M 602.73 110 H 579.59 A 28 39 0 1 0 579.59 152 H 602.73 A 50 59 0 1 1 602.73 110 Z"/>
+    <path fill-rule="evenodd" d="M 676 72 A 55 59 0 1 1 676 190 A 55 59 0 1 1 676 72 Z M 676 92 A 33 39 0 1 0 676 170 A 33 39 0 1 0 676 92 Z"/>
+    <path d="M 751 74 H 773 V 92 C 779 78 789 72 802 72 H 813 V 94 H 803 C 785 94 773 106 773 124 V 188 H 751 Z"/>
+    <path fill-rule="evenodd" d="M 910 36 H 932 V 188 H 910 V 171 C 902 184 890 190 874 190 C 845 190 825 166 825 131 C 825 96 845 72 874 72 C 890 72 902 78 910 91 Z M 910 108 C 904 97 893 92 879 92 C 861.3 92 847 109.5 847 131 C 847 152.5 861.3 170 879 170 C 893 170 904 165 910 154 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="90" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s064-title">uncord — Open Jack u symbol</title>
+  <g id="s064-symbol" fill="#111111">
+    <path d="M 32 24 H 88 V 64 H 32 Z M 32 88 H 88 V 136 A 40 40 0 0 0 168 136 V 104 H 224 V 136 A 96 96 0 0 1 32 136 Z"/>
+    <circle cx="196" cy="52" r="28"/>
+  </g>
+</svg>
+</g><text x="122" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="180" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s032-title">uncord — Open Jack u symbol</title>
+  <g id="s032-symbol" fill="#111111">
+    <path d="M 32 24 H 88 V 64 H 32 Z M 32 88 H 88 V 136 A 40 40 0 0 0 168 136 V 104 H 224 V 136 A 96 96 0 0 1 32 136 Z"/>
+    <circle cx="196" cy="52" r="28"/>
+  </g>
+</svg>
+</g><text x="196" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="238" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s016-title">uncord — Open Jack u symbol</title>
+  <g id="s016-symbol" fill="#111111">
+    <path d="M 32 24 H 88 V 64 H 32 Z M 32 88 H 88 V 136 A 40 40 0 0 0 168 136 V 104 H 224 V 136 A 96 96 0 0 1 32 136 Z"/>
+    <circle cx="196" cy="52" r="28"/>
+  </g>
+</svg>
+</g><text x="246" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="90.0" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">A · Open Jack u</text><text x="90.0" y="814" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">TRS jack-notched geometric u with</text><text x="90.0" y="840" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">free-floating signal dot</text><rect x="562.667" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="592.667" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c1-title">uncord — Air-Gap Signal Bridge symbol</title>
+  <g id="c1-symbol" fill="#111111">
+    <path d="M 24 104 L 104 24 H 156 L 24 156 Z"/>
+    <path d="M 232 152 L 152 232 H 100 L 232 100 Z"/>
+    <path d="M 102 112 H 186 L 154 144 H 70 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 960 256" x="592.667" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <title id="l1-title">uncord — Air-Gap Signal Bridge horizontal lockup</title>
+  <g id="l1-symbol" fill="#111111">
+    <path d="M 24 104 L 104 24 H 156 L 24 156 Z"/>
+    <path d="M 232 152 L 152 232 H 100 L 232 100 Z"/>
+    <path d="M 102 112 H 186 L 154 144 H 70 Z"/>
+  </g>
+  <g id="l1-wordmark" fill="#111111">
+    <path d="M 276 74 H 298 V 142 A 24 28 0 0 0 346 142 V 74 H 368 V 188 H 346 V 171 C 340 184 330 190 317 190 C 292 190 276 172 276 142 Z"/>
+    <path d="M 392 74 H 414 V 91 C 420 78 430 72 443 72 C 468 72 484 90 484 120 V 188 H 462 V 120 A 24 28 0 0 0 414 120 V 188 H 392 Z"/>
+    <path d="M 602.73 110 H 579.59 A 28 39 0 1 0 579.59 152 H 602.73 A 50 59 0 1 1 602.73 110 Z"/>
+    <path fill-rule="evenodd" d="M 676 72 A 55 59 0 1 1 676 190 A 55 59 0 1 1 676 72 Z M 676 92 A 33 39 0 1 0 676 170 A 33 39 0 1 0 676 92 Z"/>
+    <path d="M 751 74 H 773 V 92 C 779 78 789 72 802 72 H 813 V 94 H 803 C 785 94 773 106 773 124 V 188 H 751 Z"/>
+    <path fill-rule="evenodd" d="M 910 36 H 932 V 188 H 910 V 171 C 902 184 890 190 874 190 C 845 190 825 166 825 131 C 825 96 845 72 874 72 C 890 72 902 78 910 91 Z M 910 108 C 904 97 893 92 879 92 C 861.3 92 847 109.5 847 131 C 847 152.5 861.3 170 879 170 C 893 170 904 165 910 154 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="592.667" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s164-title">uncord — Air-Gap Signal Bridge symbol</title>
+  <g id="s164-symbol" fill="#111111">
+    <path d="M 24 104 L 104 24 H 156 L 24 156 Z"/>
+    <path d="M 232 152 L 152 232 H 100 L 232 100 Z"/>
+    <path d="M 102 112 H 186 L 154 144 H 70 Z"/>
+  </g>
+</svg>
+</g><text x="624.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="682.667" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s132-title">uncord — Air-Gap Signal Bridge symbol</title>
+  <g id="s132-symbol" fill="#111111">
+    <path d="M 24 104 L 104 24 H 156 L 24 156 Z"/>
+    <path d="M 232 152 L 152 232 H 100 L 232 100 Z"/>
+    <path d="M 102 112 H 186 L 154 144 H 70 Z"/>
+  </g>
+</svg>
+</g><text x="698.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="740.667" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s116-title">uncord — Air-Gap Signal Bridge symbol</title>
+  <g id="s116-symbol" fill="#111111">
+    <path d="M 24 104 L 104 24 H 156 L 24 156 Z"/>
+    <path d="M 232 152 L 152 232 H 100 L 232 100 Z"/>
+    <path d="M 102 112 H 186 L 154 144 H 70 Z"/>
+  </g>
+</svg>
+</g><text x="748.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="592.6666666666667" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">B · Air-Gap Signal Bridge</text><text x="592.6666666666667" y="814" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Parallel chamfered bus rails bridged across</text><text x="592.6666666666667" y="840" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">an open air gap</text><rect x="1065.33" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#161616" stroke-width="2"/><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1095.33" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c2-title">uncord — Hardware Port symbol</title>
+  <g id="c2-symbol" fill="#111111">
+    <path fill-rule="evenodd" d="M 72 24 H 158 V 128 A 30 30 0 0 1 98 128 V 80 A 18 18 0 0 0 62 80 V 128 A 66 66 0 0 0 194 128 V 25.05 A 48 48 0 0 1 232 72 V 184 A 48 48 0 0 1 184 232 H 72 A 48 48 0 0 1 24 184 V 72 A 48 48 0 0 1 72 24 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 960 256" x="1095.33" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <title id="l2-title">uncord — Hardware Port horizontal lockup</title>
+  <g id="l2-symbol" fill="#111111">
+    <path fill-rule="evenodd" d="M 72 24 H 158 V 128 A 30 30 0 0 1 98 128 V 80 A 18 18 0 0 0 62 80 V 128 A 66 66 0 0 0 194 128 V 25.05 A 48 48 0 0 1 232 72 V 184 A 48 48 0 0 1 184 232 H 72 A 48 48 0 0 1 24 184 V 72 A 48 48 0 0 1 72 24 Z"/>
+  </g>
+  <g id="l2-wordmark" fill="#111111">
+    <path d="M 276 74 H 298 V 142 A 24 28 0 0 0 346 142 V 74 H 368 V 188 H 346 V 171 C 340 184 330 190 317 190 C 292 190 276 172 276 142 Z"/>
+    <path d="M 392 74 H 414 V 91 C 420 78 430 72 443 72 C 468 72 484 90 484 120 V 188 H 462 V 120 A 24 28 0 0 0 414 120 V 188 H 392 Z"/>
+    <path d="M 602.73 110 H 579.59 A 28 39 0 1 0 579.59 152 H 602.73 A 50 59 0 1 1 602.73 110 Z"/>
+    <path fill-rule="evenodd" d="M 676 72 A 55 59 0 1 1 676 190 A 55 59 0 1 1 676 72 Z M 676 92 A 33 39 0 1 0 676 170 A 33 39 0 1 0 676 92 Z"/>
+    <path d="M 751 74 H 773 V 92 C 779 78 789 72 802 72 H 813 V 94 H 803 C 785 94 773 106 773 124 V 188 H 751 Z"/>
+    <path fill-rule="evenodd" d="M 910 36 H 932 V 188 H 910 V 171 C 902 184 890 190 874 190 C 845 190 825 166 825 131 C 825 96 845 72 874 72 C 890 72 902 78 910 91 Z M 910 108 C 904 97 893 92 879 92 C 861.3 92 847 109.5 847 131 C 847 152.5 861.3 170 879 170 C 893 170 904 165 910 154 Z"/>
+  </g>
+</svg>
+</g><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1095.33" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s264-title">uncord — Hardware Port symbol</title>
+  <g id="s264-symbol" fill="#111111">
+    <path fill-rule="evenodd" d="M 72 24 H 158 V 128 A 30 30 0 0 1 98 128 V 80 A 18 18 0 0 0 62 80 V 128 A 66 66 0 0 0 194 128 V 25.05 A 48 48 0 0 1 232 72 V 184 A 48 48 0 0 1 184 232 H 72 A 48 48 0 0 1 24 184 V 72 A 48 48 0 0 1 72 24 Z"/>
+  </g>
+</svg>
+</g><text x="1127.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1185.33" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s232-title">uncord — Hardware Port symbol</title>
+  <g id="s232-symbol" fill="#111111">
+    <path fill-rule="evenodd" d="M 72 24 H 158 V 128 A 30 30 0 0 1 98 128 V 80 A 18 18 0 0 0 62 80 V 128 A 66 66 0 0 0 194 128 V 25.05 A 48 48 0 0 1 232 72 V 184 A 48 48 0 0 1 184 232 H 72 A 48 48 0 0 1 24 184 V 72 A 48 48 0 0 1 72 24 Z"/>
+  </g>
+</svg>
+</g><text x="1201.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g filter="url(#grey)"><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title" viewBox="0 0 256 256" x="1243.33" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s216-title">uncord — Hardware Port symbol</title>
+  <g id="s216-symbol" fill="#111111">
+    <path fill-rule="evenodd" d="M 72 24 H 158 V 128 A 30 30 0 0 1 98 128 V 80 A 18 18 0 0 0 62 80 V 128 A 66 66 0 0 0 194 128 V 25.05 A 48 48 0 0 1 232 72 V 184 A 48 48 0 0 1 184 232 H 72 A 48 48 0 0 1 24 184 V 72 A 48 48 0 0 1 72 24 Z"/>
+  </g>
+</svg>
+</g><text x="1251.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="1095.3333333333335" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">C · Hardware Port</text><text x="1095.3333333333335" y="808" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#161616" letter-spacing="1.5">RECOMMENDED</text><text x="1095.3333333333335" y="842" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Industrial hardware plate with</text><text x="1095.3333333333335" y="868" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">negative-space u channel and core</text></svg>

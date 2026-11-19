@@ -1,0 +1,324 @@
+@import "tailwindcss";
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-app: #0d0e10;
+  --bg-panel: #15171a;
+  --bg-panel-elevated: #1b1e23;
+  --bg-well: #101215;
+  --bg-popover: #181b20;
+  --bg-hover: #20242b;
+  --bg-active-row: #1d2026;
+  --border-subtle: #24272c;
+  --border-strong: #343942;
+  --text-primary: #f5f5f3;
+  --text-secondary: #8e95a0;
+  --text-muted: #626873;
+  --accent-signal: #f25c2a;
+  --accent-signal-soft: rgba(242, 92, 42, 0.14);
+  --accent-signal-border: rgba(242, 92, 42, 0.45);
+  --status-healthy: #22c55e;
+  --status-healthy-soft: rgba(34, 197, 94, 0.14);
+  --status-warning: #f59e0b;
+  --status-warning-soft: rgba(245, 158, 11, 0.13);
+  --status-warning-border: rgba(245, 158, 11, 0.42);
+  --status-error: #ef4444;
+  --status-error-soft: rgba(239, 68, 68, 0.14);
+  --status-error-border: rgba(239, 68, 68, 0.42);
+  --meter-bg: #0b0c0e;
+  --meter-tick: #383d47;
+  --fader-track: #22262d;
+  --fader-thumb: #f5f5f3;
+  --fader-thumb-ring: #0d0e10;
+  --logo-plate: #f5f5f3;
+  --shadow-popover: 0 14px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --font-sans: "Inter", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Cascadia Mono", "Consolas", ui-monospace, monospace;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-app: #f5f5f3;
+  --bg-panel: #ffffff;
+  --bg-panel-elevated: #fafaf8;
+  --bg-well: #ecece8;
+  --bg-popover: #ffffff;
+  --bg-hover: #f0f0ec;
+  --bg-active-row: #f3f3ef;
+  --border-subtle: #dcdcd6;
+  --border-strong: #c4c4bc;
+  --text-primary: #111214;
+  --text-secondary: #5c626c;
+  --text-muted: #7a808a;
+  --accent-signal: #f25c2a;
+  --accent-signal-soft: rgba(242, 92, 42, 0.11);
+  --accent-signal-border: rgba(242, 92, 42, 0.45);
+  --status-healthy: #16a34a;
+  --status-healthy-soft: rgba(22, 163, 74, 0.12);
+  --status-warning: #d97706;
+  --status-warning-soft: rgba(217, 119, 6, 0.12);
+  --status-warning-border: rgba(217, 119, 6, 0.4);
+  --status-error: #dc2626;
+  --status-error-soft: rgba(220, 38, 38, 0.1);
+  --status-error-border: rgba(220, 38, 38, 0.38);
+  --meter-bg: #e5e5e0;
+  --meter-tick: #b8b8b0;
+  --fader-track: #d4d4cc;
+  --fader-thumb: #111214;
+  --fader-thumb-ring: #ffffff;
+  --logo-plate: #111214;
+  --shadow-popover: 0 12px 32px rgba(17, 18, 20, 0.12), 0 0 0 1px rgba(17, 18, 20, 0.06);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+  overflow-x: hidden;
+  transition: background-color 180ms var(--ease-out), color 180ms var(--ease-out);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tactile hardware button discipline */
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.tactile-btn,
+button {
+  transition:
+    transform 140ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    color 160ms var(--ease-out),
+    opacity 150ms var(--ease-out);
+}
+
+.tactile-btn:not(:disabled):active,
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.chevron-rotator {
+  transition: transform 160ms var(--ease-out);
+}
+
+/* Tactile hardware switch */
+.hw-switch {
+  transition:
+    background-color 180ms var(--ease-in-out),
+    border-color 180ms var(--ease-in-out),
+    transform 140ms var(--ease-out);
+}
+
+.hw-switch:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+.hw-switch-thumb {
+  transition:
+    transform 180ms var(--ease-in-out),
+    background-color 160ms var(--ease-out);
+}
+
+/* Origin-aware popovers: never start at scale(0) */
+.popover-surface {
+  transform-origin: var(--transform-origin, top right);
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: var(--shadow-popover);
+  transition:
+    transform 160ms var(--ease-out),
+    opacity 150ms var(--ease-out);
+}
+
+@starting-style {
+  .popover-surface {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Centered modal / dialog fallback if needed */
+.modal-surface {
+  transform-origin: center;
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: var(--shadow-popover);
+  transition:
+    transform 180ms var(--ease-out),
+    opacity 160ms var(--ease-out);
+}
+
+@starting-style {
+  .modal-surface {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Settings drawer */
+.drawer-backdrop {
+  opacity: 1;
+  transition: opacity 160ms var(--ease-out);
+}
+
+@starting-style {
+  .drawer-backdrop {
+    opacity: 0;
+  }
+}
+
+.drawer-surface {
+  opacity: 1;
+  transform: translateX(0);
+  box-shadow: var(--shadow-popover);
+  transition:
+    transform 200ms var(--ease-out),
+    opacity 180ms var(--ease-out);
+}
+
+@starting-style {
+  .drawer-surface {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+}
+
+/* Route card enter & selection transitions */
+.route-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    transform 180ms var(--ease-out),
+    opacity 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out);
+}
+
+@starting-style {
+  .route-card:not([data-instant="true"]) {
+    opacity: 0;
+    transform: translateY(4px) scale(0.985);
+  }
+}
+
+/* Instant 0ms state for keyboard-initiated actions (N, M, Esc) */
+[data-instant="true"],
+[data-instant="true"] * {
+  transition-duration: 0ms !important;
+}
+
+/* Fader thumb tactile micro-transition */
+.fader-thumb {
+  transition:
+    transform 130ms var(--ease-out),
+    border-color 140ms var(--ease-out),
+    background-color 140ms var(--ease-out);
+}
+
+.fader-track-shell[data-dragging="true"] .fader-thumb {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+/* Focus rings */
+button:focus-visible,
+input:focus-visible,
+[role="slider"]:focus-visible,
+[role="switch"]:focus-visible {
+  outline: 2px solid var(--accent-signal);
+  outline-offset: 2px;
+}
+
+/* Pointer-fine hover gating only */
+@media (hover: hover) and (pointer: fine) {
+  .hover-surface:hover {
+    background-color: var(--bg-hover);
+    border-color: var(--border-strong);
+  }
+
+  .hover-card:hover {
+    border-color: var(--border-strong);
+  }
+
+  .hover-option:hover {
+    background-color: var(--bg-hover);
+  }
+
+  .hover-accent:hover {
+    filter: brightness(1.08);
+  }
+
+  .hover-danger:hover {
+    color: var(--status-error);
+    background-color: var(--status-error-soft);
+    border-color: var(--status-error-border);
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .tactile-btn:not(:disabled):active,
+  button:not(:disabled):active,
+  .hw-switch:not(:disabled):active {
+    transform: none;
+  }
+
+  .popover-surface,
+  .modal-surface,
+  .drawer-surface,
+  .route-card {
+    transform: none !important;
+    transition: opacity 150ms ease, background-color 150ms ease, border-color 150ms ease !important;
+  }
+
+  .hw-switch-thumb,
+  .fader-thumb,
+  .chevron-rotator {
+    transition: background-color 150ms ease, border-color 150ms ease !important;
+  }
+}
+
+/* Minimal console scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}

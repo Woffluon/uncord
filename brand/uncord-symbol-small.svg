@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="title">
+  <title id="title">uncord — Hardware Port small-size symbol</title>
+  <g id="symbol">
+    <path fill="#111214" fill-rule="evenodd" d="M 68 16 H 162 V 100.07 A 44 44 0 0 0 94 100.07 V 72 A 22 22 0 0 0 50 72 V 128 A 78 78 0 0 0 206 128 V 19.21 A 52 52 0 0 1 240 68 V 188 A 52 52 0 0 1 188 240 H 68 A 52 52 0 0 1 16 188 V 68 A 52 52 0 0 1 68 16 Z"/>
+    <circle cx="128" cy="128" r="26" fill="#F25C2A"/>
+  </g>
+</svg>

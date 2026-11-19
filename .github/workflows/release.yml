@@ -1,0 +1,282 @@
+name: Release
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      target_sha:
+        description: "Commit on main to release (defaults to current main)"
+        required: false
+        type: string
+
+concurrency:
+  group: stable-release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Release Gate
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.gate.outputs.enabled }}
+    steps:
+      - name: Evaluate release gate
+        id: gate
+        run: |
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "### Release gate" >> "$GITHUB_STEP_SUMMARY"
+          echo "Direct push on main is eligible for release discovery." >> "$GITHUB_STEP_SUMMARY"
+
+  preflight:
+    name: Release Preflight
+    needs: gate
+    if: needs.gate.outputs.enabled == 'true'
+    runs-on: windows-latest
+    outputs:
+      target_sha: ${{ steps.target.outputs.sha }}
+    steps:
+      - name: Checkout main history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve target commit
+        id: target
+        shell: powershell
+        env:
+          DISPATCH_SHA: ${{ inputs.target_sha }}
+        run: |
+          $Requested = if ($env:DISPATCH_SHA) { $env:DISPATCH_SHA } else { "origin/main" }
+          $Target = (& git rev-parse "$Requested^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0) { throw "Cannot resolve release target '$Requested'." }
+          & git merge-base --is-ancestor $Target origin/main
+          if ($LASTEXITCODE -ne 0) { throw "Release target must be reachable from main: $Target" }
+          powershell -File scripts/validate-version.ps1 -CommitSha $Target
+          if ($LASTEXITCODE -ne 0) { throw "Version validation failed for $Target" }
+          "sha=$Target" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+  discover:
+    name: Discover Unreleased Versions
+    needs: preflight
+    runs-on: windows-latest
+    outputs:
+      releases: ${{ steps.discover.outputs.releases }}
+      count: ${{ steps.discover.outputs.count }}
+    steps:
+      - name: Checkout target history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.preflight.outputs.target_sha }}
+          fetch-depth: 0
+
+      - name: Find version-changing commits since latest tag
+        id: discover
+        shell: powershell
+        env:
+          TARGET_SHA: ${{ needs.preflight.outputs.target_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          powershell -File scripts/discover-release-backlog.ps1 -TargetSha $env:TARGET_SHA
+          if ($LASTEXITCODE -ne 0) { throw "Release discovery failed for $($env:TARGET_SHA)." }
+
+  verify:
+    name: Verify Release Candidate (windows-x64)
+    needs: [ preflight, discover ]
+    if: success() && needs.discover.outputs.count != '0'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout release candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.preflight.outputs.target_sha }}
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Verify Rust toolchain
+        shell: pwsh
+        run: |
+          rustc --version
+          cargo --version
+          rustup component add clippy
+
+      - name: Verify Version & Documentation Contracts
+        shell: pwsh
+        env:
+          TARGET_SHA: ${{ needs.preflight.outputs.target_sha }}
+        run: |
+          pwsh -File scripts/test-versioning.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -File scripts/test-verify-docs.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -File scripts/validate-version.ps1 -CommitSha $env:TARGET_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -File scripts/verify-docs.ps1 -CommitSha $env:TARGET_SHA
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck frontend
+        run: pnpm typecheck
+
+      - name: Build frontend bundle
+        run: pnpm build
+
+      - name: Run Rust workspace tests
+        run: cargo test --workspace
+
+      - name: Run clock-drift and software latency benchmark
+        run: cargo test -p uncord-core --release -- --nocapture bench_pipeline_latency_and_drift
+
+      - name: Enforce zero Clippy warnings
+        run: cargo clippy --workspace -- -D warnings
+
+  publish:
+    name: Publish ${{ matrix.release.tag }}
+    needs: [ discover, verify ]
+    if: success() && needs.discover.outputs.count != '0'
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        release: ${{ fromJson(needs.discover.outputs.releases) }}
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ matrix.release.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check immutable tag and release state
+        id: state
+        shell: powershell
+        env:
+          RELEASE_SHA: ${{ matrix.release.sha }}
+          RELEASE_TAG: ${{ matrix.release.tag }}
+          RELEASE_VERSION: ${{ matrix.release.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = "Stop"
+          $CheckSha = $env:RELEASE_SHA
+          $RemoteTag = @(& git ls-remote --tags origin "refs/tags/$($env:RELEASE_TAG)" "refs/tags/$($env:RELEASE_TAG)^{}")
+          if ($LASTEXITCODE -ne 0) { throw "Failed to query remote tag state for $($env:RELEASE_TAG)." }
+          if ($RemoteTag.Count -gt 0) {
+            & git fetch --force origin "refs/tags/$($env:RELEASE_TAG):refs/tags/$($env:RELEASE_TAG)" | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to fetch existing tag $($env:RELEASE_TAG)." }
+            $CheckSha = (& git rev-list -n 1 $env:RELEASE_TAG).Trim()
+            if ($LASTEXITCODE -ne 0 -or -not $CheckSha) { throw "Cannot resolve commit for existing tag $($env:RELEASE_TAG)." }
+            & git merge-base --is-ancestor $CheckSha $env:RELEASE_SHA
+            if ($LASTEXITCODE -ne 0) { throw "Existing tag $($env:RELEASE_TAG) ($CheckSha) is not an ancestor of $($env:RELEASE_SHA)." }
+          }
+          powershell -File scripts/test-existing-release.ps1 `
+            -ReleaseSha $CheckSha `
+            -ReleaseTag $env:RELEASE_TAG `
+            -Version $env:RELEASE_VERSION
+          if ($LASTEXITCODE -ne 0) { throw "Existing release verification failed for $($env:RELEASE_TAG)." }
+          $Subject = (& git log -1 --format="%s" $env:RELEASE_SHA).Trim()
+          "COMMIT_MSG=$Subject" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Setup pnpm
+        if: steps.state.outputs.needed == 'true'
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: Setup Node.js
+        if: steps.state.outputs.needed == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        if: steps.state.outputs.needed == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Build frontend bundle
+        if: steps.state.outputs.needed == 'true'
+        run: pnpm build
+
+      - name: Build release CLI binary
+        if: steps.state.outputs.needed == 'true'
+        run: cargo build --release -p uncord-cli
+
+      - name: Build Tauri v2 desktop app & NSIS installer
+        if: steps.state.outputs.needed == 'true'
+        run: pnpm tauri build
+
+      - name: Stage release artifacts & SHA-256 checksums
+        if: steps.state.outputs.needed == 'true'
+        shell: powershell
+        run: |
+          powershell -File scripts/stage-release.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Publish immutable GitHub release
+        if: steps.state.outputs.needed == 'true'
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
+        with:
+          tag_name: ${{ matrix.release.tag }}
+          name: uncord ${{ matrix.release.tag }}
+          body: |
+            ${{ env.COMMIT_MSG || matrix.release.tag }}
+
+            ### Windows x64 Usage
+            - **Desktop Studio:** Run `uncord.exe` (or `uncord.exe --start-minimized` for tray-only boot)
+            - **Headless CLI:** `uncord-cli.exe --list-devices` or `uncord-cli.exe --headless --profile "Practice"`
+
+            ### Release Artifacts
+            - **Portable Archive:** `uncord-v${{ matrix.release.version }}-windows-x64-portable.zip` (`uncord.exe`, `uncord-cli.exe`, `README.md`, `LICENSE`)
+            - **Windows Installer:** `uncord_${{ matrix.release.version }}_x64-setup.exe` (when bundled via NSIS)
+            - **SHA-256 Checksums:** `uncord-v${{ matrix.release.version }}-SHA256SUMS.txt`
+          target_commitish: ${{ matrix.release.sha }}
+          files: artifacts/*
+          generate_release_notes: false
+          draft: false
+          prerelease: false
+          make_latest: "false"
+          token: ${{ github.token }}
+
+  finalize:
+    name: Finalize Latest Release
+    needs: [ discover, publish ]
+    if: success() && needs.discover.outputs.count != '0' && needs.publish.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Mark newest release as latest
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASES_JSON: ${{ needs.discover.outputs.releases }}
+        run: |
+          $Discovered = @($env:RELEASES_JSON | ConvertFrom-Json)
+          if ($Discovered.Count -eq 0) { throw "Release discovery output is empty." }
+          $Latest = $Discovered | Sort-Object { [version]$_.version } -Descending | Select-Object -First 1
+          $PublishedJson = gh release view $Latest.tag --repo $env:GITHUB_REPOSITORY --json tagName,isDraft,isPrerelease
+          if ($LASTEXITCODE -ne 0) { throw "Cannot read discovered release $($Latest.tag)." }
+          $Published = $PublishedJson | ConvertFrom-Json
+          if ($Published.tagName -cne $Latest.tag -or $Published.isDraft -or $Published.isPrerelease) {
+            throw "Discovered release $($Latest.tag) is not a published stable release."
+          }
+          gh release edit $Latest.tag --repo $env:GITHUB_REPOSITORY --latest
+          if ($LASTEXITCODE -ne 0) { throw "Cannot mark discovered release $($Latest.tag) as latest." }

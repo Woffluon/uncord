@@ -1,0 +1,15 @@
+# Build outputs
+/target/
+**/target/
+/dist/
+/artifacts/
+/src-tauri/gen/
+
+# Dependencies
+/node_modules/
+
+# Local tooling / OS
+/.codegraph/
+*.log
+.DS_Store
+Thumbs.db
