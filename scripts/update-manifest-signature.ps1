@@ -65,11 +65,18 @@ function Write-PrivatePemFromSecret([string]$Path, [string]$SecretBase64) {
         throw "UPDATE_MANIFEST_PRIVATE_KEY_BASE64 is required for signing."
     }
     try {
-        $PrivateDer = [Convert]::FromBase64String($SecretBase64.Trim())
+        $Bytes = [Convert]::FromBase64String($SecretBase64.Trim())
     } catch {
         throw "UPDATE_MANIFEST_PRIVATE_KEY_BASE64 is not valid base64."
     }
-    Write-PemFile $Path "PRIVATE KEY" $PrivateDer
+    # If the base64 secret is already a PEM-encoded string, write it directly.
+    # Otherwise if it is raw PKCS#8 DER bytes, wrap it in PEM headers.
+    $IsPem = ($Bytes.Length -ge 5 -and $Bytes[0] -eq 0x2D -and $Bytes[1] -eq 0x2D -and $Bytes[2] -eq 0x2D -and $Bytes[3] -eq 0x2D -and $Bytes[4] -eq 0x2D)
+    if ($IsPem) {
+        [IO.File]::WriteAllBytes($Path, $Bytes)
+    } else {
+        Write-PemFile $Path "PRIVATE KEY" $Bytes
+    }
 }
 
 function Invoke-OpenSsl([string]$OpenSsl, [string[]]$Arguments) {
